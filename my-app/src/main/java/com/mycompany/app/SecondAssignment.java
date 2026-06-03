@@ -5,37 +5,35 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
-public class App {
+public class SecondAssignment {
     private static final String WEB_DRIVER_LOCATION = "D:/Dwlnds/chromedriver-win64/chromedriver-win64/chromedriver.exe";
     private static final String BROWSER_EXE_PATH = "D:/Dwlnds/chrome-win64/chrome-win64/chrome.exe";
 
-    public static void main(String[] args) {
-        fetchGeneratedPassword();
-        SecondAssignment.execute();
-        ThirdAssignment.execute();
-    }
-
-    public static void fetchGeneratedPassword() {
+    public static void execute() {
         System.setProperty("webdriver.chrome.driver", WEB_DRIVER_LOCATION);
 
         ChromeOptions browserOptions = new ChromeOptions();
         browserOptions.setBinary(BROWSER_EXE_PATH);
-        browserOptions.addArguments("--log-level=3");
 
         WebDriver browserInstance = new ChromeDriver(browserOptions);
 
         try {
-            browserInstance.get("https://www.calculator.net/password-generator.html");
+            browserInstance.get("https://api.ipify.org/?format=json");
+            Thread.sleep(1000);
 
-            Thread.sleep(2000);
+            WebElement rawContent = browserInstance.findElement(By.tagName("pre"));
+            String jsonData = rawContent.getText();
 
-            WebElement passwordField = browserInstance.findElement(By.cssSelector("div.verybigtext"));
-            String extractedSecret = passwordField.getText();
+            JSONParser jsonParser = new JSONParser();
+            JSONObject parsedObject = (JSONObject) jsonParser.parse(jsonData);
+            String userAddress = (String) parsedObject.get("ip");
 
-            extractedSecret = extractedSecret.replaceAll("<[^>]*>", "").trim();
-
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            System.out.println("Error in Task 2: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             browserInstance.quit();
         }
